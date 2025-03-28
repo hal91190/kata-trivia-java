@@ -115,8 +115,6 @@ public class Game implements GameInterface {
    }
 
    private Player currentPlayer;
-   boolean isGettingOutOfPenaltyBox;
-
    private Board board = new Board();
 
    public Game() {
@@ -145,10 +143,9 @@ public class Game implements GameInterface {
       if (currentPlayer.isInPenaltyBox()) {
          if (roll % 2 != 0) {
             System.out.println(currentPlayer.getName() + " is getting out of the penalty box");
-            isGettingOutOfPenaltyBox = true;
+            currentPlayer.leavePenaltyBox();
          } else {
             System.out.println(currentPlayer.getName() + " is not getting out of the penalty box");
-            isGettingOutOfPenaltyBox = false;
             return;
          }
       }
@@ -164,7 +161,7 @@ public class Game implements GameInterface {
 
    public boolean handleCorrectAnswer() {
       boolean hasNotWon = true;
-      if (currentPlayer.isFree() || isGettingOutOfPenaltyBox) {
+      if (currentPlayer.isFree()) {
          System.out.println("Answer was correct!!!!");
          currentPlayer.gainsCoin();
          System.out.println(currentPlayer.getName()
