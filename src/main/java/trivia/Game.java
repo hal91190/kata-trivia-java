@@ -1,8 +1,11 @@
 package trivia;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Player {
    private final String name;
@@ -21,36 +24,43 @@ class Player {
       return name;
    }
 
-   public boolean isInPenaltyBox() {
-      return inPenaltyBox;
+   public int getPosition() {
+      return position + 1;
    }
 
    public void advances(int roll) {
       this.position = (this.position + roll) % Game.NUMBER_OF_PLACES;
    }
 
-   public int getPosition() {
-      return position + 1;
+   public int getPurse() {
+      return purse;
    }
 
    public void gainsCoin() {
       this.purse++;
    }
 
-   public int getPurse() {
-      return purse;
+   public boolean hasNotWon() {
+      return getPurse() < Game.NUMBER_OF_COINS_TO_WIN;
+   }
+
+   public boolean isInPenaltyBox() {
+      return inPenaltyBox;
+   }
+
+   public boolean isFree() {
+      return !isInPenaltyBox();
    }
 
    public void sendToPenaltyBox() {
       this.inPenaltyBox = true;
    }
 
-   public boolean hasWon() {
-      return getPurse() < Game.NUMBER_OF_COINS_TO_WIN;
-   }
-
-   public boolean isFree() {
-      return !isInPenaltyBox();
+   public void leavePenaltyBox() {
+      if (isFree()) {
+         throw new IllegalStateException(name + " is not in the penalty box");
+      }
+      this.inPenaltyBox = false;
    }
 }
 
@@ -97,10 +107,13 @@ public class Game implements GameInterface {
 
    List<Player> players = new ArrayList<>();
 
-   List<String> popQuestions = new LinkedList<>();
-   List<String> scienceQuestions = new LinkedList<>();
-   List<String> sportsQuestions = new LinkedList<>();
-   List<String> rockQuestions = new LinkedList<>();
+   private Map<Category, Deque<String>> questions = new HashMap<>();
+   {
+      questions.put(Category.POP, new ArrayDeque<>());
+      questions.put(Category.SCIENCE, new ArrayDeque<>());
+      questions.put(Category.SPORTS, new ArrayDeque<>());
+      questions.put(Category.ROCK, new ArrayDeque<>());
+   }
 
    private Player currentPlayer;
    boolean isGettingOutOfPenaltyBox;
@@ -109,10 +122,10 @@ public class Game implements GameInterface {
 
    public Game() {
       for (int i = 0; i < 50; i++) {
-         popQuestions.addLast("Pop Question " + i);
-         scienceQuestions.addLast("Science Question " + i);
-         sportsQuestions.addLast("Sports Question " + i);
-         rockQuestions.addLast("Rock Question " + i);
+         questions.get(Category.POP).addLast("Pop Question " + i);
+         questions.get(Category.SCIENCE).addLast("Science Question " + i);
+         questions.get(Category.SPORTS).addLast("Sports Question " + i);
+         questions.get(Category.ROCK).addLast("Rock Question " + i);
       }
    }
 
@@ -145,22 +158,13 @@ public class Game implements GameInterface {
       System.out.println(currentPlayer.getName()
                            + "'s new location is "
                            + currentPlayer.getPosition());
-      System.out.println("The category is " + board.getCategory(currentPlayer));
-      askQuestion();
-   }
-
-   private void askQuestion() {
-      var category = board.getCategory(currentPlayer.getPosition());
-      switch (category) {
-         case POP -> System.out.println(popQuestions.removeFirst());
-         case SCIENCE -> System.out.println(scienceQuestions.removeFirst());
-         case SPORTS -> System.out.println(sportsQuestions.removeFirst());
-         case ROCK -> System.out.println(rockQuestions.removeFirst());
-      }
+      var category = board.getCategory(currentPlayer);
+      System.out.println("The category is " + category);
+      System.out.println(questions.get(category).removeFirst());
    }
 
    public boolean handleCorrectAnswer() {
-      boolean hasWon = true;
+      boolean hasNotWon = true;
       if (currentPlayer.isFree() || isGettingOutOfPenaltyBox) {
          System.out.println("Answer was correct!!!!");
          currentPlayer.gainsCoin();
@@ -169,10 +173,10 @@ public class Game implements GameInterface {
                               + currentPlayer.getPurse()
                               + " Gold Coins.");
 
-         hasWon = currentPlayer.hasWon();
+         hasNotWon = currentPlayer.hasNotWon();
       }
       nextPlayer();
-      return hasWon;
+      return hasNotWon;
    }
 
    public boolean wrongAnswer() {
