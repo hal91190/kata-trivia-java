@@ -11,7 +11,7 @@ public class Board {
          );
 
    public Category getCategory(Player player) {
-      return getCategory(player.getPosition());
+      return getCategory(player.position());
    }
 
    public Category getCategory(int position) {

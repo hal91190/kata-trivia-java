@@ -11,7 +11,7 @@ public class Game implements GameInterface {
 
    private Questions questions = new Questions();
 
-   private Player currentPlayer;
+   private Player currentPlayer; // Can be a bug if add is not called before roll
    private Board board = new Board();
 
    public boolean add(String playerName) {
@@ -19,29 +19,29 @@ public class Game implements GameInterface {
       players.add(player);
       currentPlayer = players.getFirst();
 
-      System.out.println(player.getName() + " was added");
+      System.out.println(player.name() + " was added");
       System.out.println("They are player number " + players.size());
-      return true;
+      return true; // Always returning true smells
    }
 
    public void roll(int roll) {
-      System.out.println(currentPlayer.getName() + " is the current player");
+      System.out.println(currentPlayer.name() + " is the current player");
       System.out.println("They have rolled a " + roll);
 
       if (currentPlayer.isInPenaltyBox()) {
          if (roll % 2 != 0) {
-            System.out.println(currentPlayer.getName() + " is getting out of the penalty box");
+            System.out.println(currentPlayer.name() + " is getting out of the penalty box");
             currentPlayer.leavePenaltyBox();
          } else {
-            System.out.println(currentPlayer.getName() + " is not getting out of the penalty box");
+            System.out.println(currentPlayer.name() + " is not getting out of the penalty box");
             return;
          }
       }
       currentPlayer.advances(roll);
 
-      System.out.println(currentPlayer.getName()
+      System.out.println(currentPlayer.name()
                            + "'s new location is "
-                           + currentPlayer.getPosition());
+                           + currentPlayer.position());
       var category = board.getCategory(currentPlayer);
       System.out.println("The category is " + category);
       System.out.println(questions.nextQuestion(category));
@@ -52,9 +52,9 @@ public class Game implements GameInterface {
       if (currentPlayer.isFree()) {
          System.out.println("Answer was correct!!!!");
          currentPlayer.gainsCoin();
-         System.out.println(currentPlayer.getName()
+         System.out.println(currentPlayer.name()
                               + " now has "
-                              + currentPlayer.getPurse()
+                              + currentPlayer.coins()
                               + " Gold Coins.");
 
          hasNotWon = currentPlayer.hasNotWon();
@@ -65,11 +65,11 @@ public class Game implements GameInterface {
 
    public boolean wrongAnswer() {
       System.out.println("Question was incorrectly answered");
-      System.out.println(currentPlayer.getName() + " was sent to the penalty box");
+      System.out.println(currentPlayer.name() + " was sent to the penalty box");
       currentPlayer.sendToPenaltyBox();
 
       nextPlayer();
-      return true;
+      return true; // Always returning true smells
    }
 
    private void nextPlayer() {
