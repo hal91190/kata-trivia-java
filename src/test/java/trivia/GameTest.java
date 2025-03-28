@@ -1,14 +1,14 @@
 
 package trivia;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class GameTest {
 	@Test
@@ -30,12 +30,12 @@ public class GameTest {
 			expectedOutput, actualOutput);
 	}
 	@Test
-	@Ignore("enable back and set a particular seed to see the output")
+	@Disabled("enable back and set a particular seed to see the output")
 	public void oneSeed() {
 		testSeed(1, true);
 	}
 
-	private String extractOutput(Random rand, IGame aGame) {
+	private String extractOutput(Random rand, GameInterface aGame) {
 		PrintStream old = System.out;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (PrintStream inmemory = new PrintStream(baos)) {

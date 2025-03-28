@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 // REFACTOR ME
-public class Game implements IGame {
+public class Game implements GameInterface {
    ArrayList players = new ArrayList();
    int[] places = new int[6];
    int[] purses = new int[6];

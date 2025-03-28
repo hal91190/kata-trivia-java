@@ -17,31 +17,31 @@ public class PlayGame {
       if (playerCount < 1 || playerCount > 4) throw new IllegalArgumentException("No player 1..4");
       System.out.println("Reading names for " + playerCount + " players:");
 
-      IGame aGame = new GameOld();
+      GameInterface currentGame = new GameOld();
 
       for (int i = 1; i <= playerCount; i++) {
-         System.out.print("Player "+i+" name: ");
+         System.out.print("Player " + i + " name: ");
          String playerName = scanner.nextLine();
-         aGame.add(playerName);
+         currentGame.add(playerName);
       }
 
       System.out.println("\n\n--Starting game--");
 
 
-      boolean notAWinner;
+      boolean noWinner;
       do {
          int roll = readRoll();
-         aGame.roll(roll);
+         currentGame.roll(roll);
 
          System.out.print(">> Was the answer correct? [y/n] ");
          boolean correct = readYesNo();
          if (correct) {
-            notAWinner = aGame.handleCorrectAnswer();
+            noWinner = currentGame.handleCorrectAnswer();
          } else {
-            notAWinner = aGame.wrongAnswer();
+            noWinner = currentGame.wrongAnswer();
          }
 
-      } while (notAWinner);
+      } while (noWinner);
       System.out.println(">> Game won!");
    }
 

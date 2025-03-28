@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 
 // TODO refactor me
-public class GameOld implements IGame {
+public class GameOld implements GameInterface {
    ArrayList players = new ArrayList();
    int[] places = new int[6];
    int[] purses = new int[6];
