@@ -1,130 +1,18 @@
 package trivia;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-class Player {
-   private final String name;
-   private int position;
-   private int purse;
-   private boolean inPenaltyBox;
-
-   public Player(String name) {
-      this.name = name;
-      this.position = 0;
-      this.purse = 0;
-      this.inPenaltyBox = false;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public int getPosition() {
-      return position + 1;
-   }
-
-   public void advances(int roll) {
-      this.position = (this.position + roll) % Game.NUMBER_OF_PLACES;
-   }
-
-   public int getPurse() {
-      return purse;
-   }
-
-   public void gainsCoin() {
-      this.purse++;
-   }
-
-   public boolean hasNotWon() {
-      return getPurse() < Game.NUMBER_OF_COINS_TO_WIN;
-   }
-
-   public boolean isInPenaltyBox() {
-      return inPenaltyBox;
-   }
-
-   public boolean isFree() {
-      return !isInPenaltyBox();
-   }
-
-   public void sendToPenaltyBox() {
-      this.inPenaltyBox = true;
-   }
-
-   public void leavePenaltyBox() {
-      if (isFree()) {
-         throw new IllegalStateException(name + " is not in the penalty box");
-      }
-      this.inPenaltyBox = false;
-   }
-}
-
-enum Category {
-   POP("Pop"), SCIENCE("Science"), SPORTS("Sports"), ROCK("Rock");
-
-   private String name;
-
-   Category(String name) {
-      this.name = name;
-   }
-
-   @Override
-   public String toString() {
-      return name;
-   }
-}
-
-class Board {
-   private final List<Category> categories =
-      List.of(
-         Category.POP, Category.SCIENCE, Category.SPORTS, Category.ROCK,
-         Category.POP, Category.SCIENCE, Category.SPORTS, Category.ROCK,
-         Category.POP, Category.SCIENCE, Category.SPORTS, Category.ROCK
-         );
-
-   public Category getCategory(Player player) {
-      return getCategory(player.getPosition());
-   }
-
-   public Category getCategory(int position) {
-      position--;
-      if (position < 0 || position >= categories.size()) {
-         throw new IllegalArgumentException("Invalid index");
-      }
-      return categories.get(position);
-   }
-}
 
 public class Game implements GameInterface {
    public static final int NUMBER_OF_COINS_TO_WIN = 6;
-
    public static final int NUMBER_OF_PLACES = 12;
 
    private List<Player> players = new ArrayList<>();
 
-   private Map<Category, Deque<String>> questions = new HashMap<>();
-   {
-      Stream.of(Category.values())
-         .forEach(category -> questions.put(category, new ArrayDeque<>()));
-   }
+   private Questions questions = new Questions();
 
    private Player currentPlayer;
    private Board board = new Board();
-
-   public Game() {
-      for (int i = 0; i < 50; i++) {
-         questions.get(Category.POP).addLast("Pop Question " + i);
-         questions.get(Category.SCIENCE).addLast("Science Question " + i);
-         questions.get(Category.SPORTS).addLast("Sports Question " + i);
-         questions.get(Category.ROCK).addLast("Rock Question " + i);
-      }
-   }
 
    public boolean add(String playerName) {
       var player = new Player(playerName);
@@ -156,7 +44,7 @@ public class Game implements GameInterface {
                            + currentPlayer.getPosition());
       var category = board.getCategory(currentPlayer);
       System.out.println("The category is " + category);
-      System.out.println(questions.get(category).removeFirst());
+      System.out.println(questions.nextQuestion(category));
    }
 
    public boolean handleCorrectAnswer() {
