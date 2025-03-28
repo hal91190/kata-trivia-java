@@ -48,6 +48,10 @@ class Player {
    public boolean hasWon() {
       return getPurse() < Game.NUMBER_OF_COINS_TO_WIN;
    }
+
+   public boolean isFree() {
+      return !isInPenaltyBox();
+   }
 }
 
 enum Category {
@@ -168,42 +172,20 @@ public class Game implements GameInterface {
 
    public boolean handleCorrectAnswer() {
       var currentPlayer = players.get(currentPlayerIndex);
-      if (currentPlayer.isInPenaltyBox()) {
-         if (isGettingOutOfPenaltyBox) {
-            System.out.println("Answer was correct!!!!");
-            currentPlayer.gainsCoin();
-            System.out.println(currentPlayer.getName()
-                               + " now has "
-                               + currentPlayer.getPurse()
-                               + " Gold Coins.");
-
-            boolean hasWon = currentPlayer.hasWon();
-            currentPlayerIndex++;
-            if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
-
-            return hasWon;
-         } else {
-            currentPlayerIndex++;
-            if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
-            return true;
-         }
-
-
-      } else {
-
+      boolean hasWon = true;
+      if (currentPlayer.isFree() || isGettingOutOfPenaltyBox) {
          System.out.println("Answer was correct!!!!");
          currentPlayer.gainsCoin();
          System.out.println(currentPlayer.getName()
-                           + " now has "
-                           + currentPlayer.getPurse()
-                           + " Gold Coins.");
+                              + " now has "
+                              + currentPlayer.getPurse()
+                              + " Gold Coins.");
 
-         boolean hasWon = currentPlayer.hasWon();
-         currentPlayerIndex++;
-         if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
-
-         return hasWon;
+         hasWon = currentPlayer.hasWon();
       }
+      currentPlayerIndex++;
+      if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
+      return hasWon;
    }
 
    public boolean wrongAnswer() {
