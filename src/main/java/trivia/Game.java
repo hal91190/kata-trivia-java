@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 class Player {
    private final String name;
@@ -105,14 +106,12 @@ public class Game implements GameInterface {
 
    public static final int NUMBER_OF_PLACES = 12;
 
-   List<Player> players = new ArrayList<>();
+   private List<Player> players = new ArrayList<>();
 
    private Map<Category, Deque<String>> questions = new HashMap<>();
    {
-      questions.put(Category.POP, new ArrayDeque<>());
-      questions.put(Category.SCIENCE, new ArrayDeque<>());
-      questions.put(Category.SPORTS, new ArrayDeque<>());
-      questions.put(Category.ROCK, new ArrayDeque<>());
+      Stream.of(Category.values())
+         .forEach(category -> questions.put(category, new ArrayDeque<>()));
    }
 
    private Player currentPlayer;
