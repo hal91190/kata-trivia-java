@@ -2,18 +2,18 @@ package trivia;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
-// REFACTOR ME
 public class Game implements GameInterface {
-   ArrayList players = new ArrayList();
+   List<String> players = new ArrayList<>();
    int[] places = new int[6];
    int[] purses = new int[6];
    boolean[] inPenaltyBox = new boolean[6];
 
-   LinkedList popQuestions = new LinkedList();
-   LinkedList scienceQuestions = new LinkedList();
-   LinkedList sportsQuestions = new LinkedList();
-   LinkedList rockQuestions = new LinkedList();
+   List<String> popQuestions = new LinkedList<>();
+   List<String> scienceQuestions = new LinkedList<>();
+   List<String> sportsQuestions = new LinkedList<>();
+   List<String> rockQuestions = new LinkedList<>();
 
    int currentPlayer = 0;
    boolean isGettingOutOfPenaltyBox;
