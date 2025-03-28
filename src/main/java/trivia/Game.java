@@ -132,31 +132,21 @@ public class Game implements GameInterface {
 
       if (currentPlayer.isInPenaltyBox()) {
          if (roll % 2 != 0) {
-            isGettingOutOfPenaltyBox = true;
-
             System.out.println(currentPlayer.getName() + " is getting out of the penalty box");
-            currentPlayer.advances(roll);
-
-            System.out.println(currentPlayer.getName()
-                               + "'s new location is "
-                               + currentPlayer.getPosition());
-            System.out.println("The category is " + board.getCategory(currentPlayer));
-            askQuestion();
+            isGettingOutOfPenaltyBox = true;
          } else {
             System.out.println(currentPlayer.getName() + " is not getting out of the penalty box");
             isGettingOutOfPenaltyBox = false;
+            return;
          }
-
-      } else {
-         currentPlayer.advances(roll);
-
-         System.out.println(currentPlayer.getName()
-                              + "'s new location is "
-                              + currentPlayer.getPosition());
-         System.out.println("The category is " + board.getCategory(currentPlayer));
-         askQuestion();
       }
+      currentPlayer.advances(roll);
 
+      System.out.println(currentPlayer.getName()
+                           + "'s new location is "
+                           + currentPlayer.getPosition());
+      System.out.println("The category is " + board.getCategory(currentPlayer));
+      askQuestion();
    }
 
    private void askQuestion() {
