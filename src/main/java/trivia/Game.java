@@ -44,10 +44,50 @@ class Player {
    public void sendToPenaltyBox() {
       this.inPenaltyBox = true;
    }
+
+   public boolean hasWon() {
+      return getPurse() < Game.NUMBER_OF_COINS_TO_WIN;
+   }
+}
+
+enum Category {
+   POP("Pop"), SCIENCE("Science"), SPORTS("Sports"), ROCK("Rock");
+
+   private String name;
+
+   Category(String name) {
+      this.name = name;
+   }
+
+   @Override
+   public String toString() {
+      return name;
+   }
+}
+
+class Board {
+   private final List<Category> categories =
+      List.of(
+         Category.POP, Category.SCIENCE, Category.SPORTS, Category.ROCK,
+         Category.POP, Category.SCIENCE, Category.SPORTS, Category.ROCK,
+         Category.POP, Category.SCIENCE, Category.SPORTS, Category.ROCK
+         );
+
+   public Category getCategory(Player player) {
+      return getCategory(player.getPosition());
+   }
+
+   public Category getCategory(int position) {
+      position--;
+      if (position < 0 || position >= categories.size()) {
+         throw new IllegalArgumentException("Invalid index");
+      }
+      return categories.get(position);
+   }
 }
 
 public class Game implements GameInterface {
-   private static final int NUMBER_OF_COINS_TO_WIN = 6;
+   public static final int NUMBER_OF_COINS_TO_WIN = 6;
 
    public static final int NUMBER_OF_PLACES = 12;
 
@@ -61,21 +101,15 @@ public class Game implements GameInterface {
    int currentPlayerIndex = 0;
    boolean isGettingOutOfPenaltyBox;
 
+   private Board board = new Board();
+
    public Game() {
       for (int i = 0; i < 50; i++) {
          popQuestions.addLast("Pop Question " + i);
-         scienceQuestions.addLast(("Science Question " + i));
-         sportsQuestions.addLast(("Sports Question " + i));
-         rockQuestions.addLast(createRockQuestion(i));
+         scienceQuestions.addLast("Science Question " + i);
+         sportsQuestions.addLast("Sports Question " + i);
+         rockQuestions.addLast("Rock Question " + i);
       }
-   }
-
-   public String createRockQuestion(int index) {
-      return "Rock Question " + index;
-   }
-
-   public boolean isPlayable() {
-      return (howManyPlayers() >= 2);
    }
 
    public boolean add(String playerName) {
@@ -85,10 +119,6 @@ public class Game implements GameInterface {
       System.out.println(player.getName() + " was added");
       System.out.println("They are player number " + players.size());
       return true;
-   }
-
-   public int howManyPlayers() {
-      return players.size();
    }
 
    public void roll(int roll) {
@@ -106,7 +136,7 @@ public class Game implements GameInterface {
             System.out.println(currentPlayer.getName()
                                + "'s new location is "
                                + currentPlayer.getPosition());
-            System.out.println("The category is " + currentCategory());
+            System.out.println("The category is " + board.getCategory(currentPlayer));
             askQuestion();
          } else {
             System.out.println(currentPlayer.getName() + " is not getting out of the penalty box");
@@ -119,37 +149,21 @@ public class Game implements GameInterface {
          System.out.println(currentPlayer.getName()
                               + "'s new location is "
                               + currentPlayer.getPosition());
-         System.out.println("The category is " + currentCategory());
+         System.out.println("The category is " + board.getCategory(currentPlayer));
          askQuestion();
       }
 
    }
 
    private void askQuestion() {
-      if (currentCategory() == "Pop")
-         System.out.println(popQuestions.removeFirst());
-      if (currentCategory() == "Science")
-         System.out.println(scienceQuestions.removeFirst());
-      if (currentCategory() == "Sports")
-         System.out.println(sportsQuestions.removeFirst());
-      if (currentCategory() == "Rock")
-         System.out.println(rockQuestions.removeFirst());
-   }
-
-
-   private String currentCategory() {
       var currentPlayer = players.get(currentPlayerIndex);
-
-      if (currentPlayer.getPosition() - 1 == 0) return "Pop";
-      if (currentPlayer.getPosition() - 1 == 4) return "Pop";
-      if (currentPlayer.getPosition() - 1 == 8) return "Pop";
-      if (currentPlayer.getPosition() - 1 == 1) return "Science";
-      if (currentPlayer.getPosition() - 1 == 5) return "Science";
-      if (currentPlayer.getPosition() - 1 == 9) return "Science";
-      if (currentPlayer.getPosition() - 1 == 2) return "Sports";
-      if (currentPlayer.getPosition() - 1 == 6) return "Sports";
-      if (currentPlayer.getPosition() - 1 == 10) return "Sports";
-      return "Rock";
+      var category = board.getCategory(currentPlayer.getPosition());
+      switch (category) {
+         case POP -> System.out.println(popQuestions.removeFirst());
+         case SCIENCE -> System.out.println(scienceQuestions.removeFirst());
+         case SPORTS -> System.out.println(sportsQuestions.removeFirst());
+         case ROCK -> System.out.println(rockQuestions.removeFirst());
+      }
    }
 
    public boolean handleCorrectAnswer() {
@@ -163,11 +177,11 @@ public class Game implements GameInterface {
                                + currentPlayer.getPurse()
                                + " Gold Coins.");
 
-            boolean winner = didPlayerWin();
+            boolean hasWon = currentPlayer.hasWon();
             currentPlayerIndex++;
             if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
 
-            return winner;
+            return hasWon;
          } else {
             currentPlayerIndex++;
             if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
@@ -184,11 +198,11 @@ public class Game implements GameInterface {
                            + currentPlayer.getPurse()
                            + " Gold Coins.");
 
-         boolean winner = didPlayerWin();
+         boolean hasWon = currentPlayer.hasWon();
          currentPlayerIndex++;
          if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
 
-         return winner;
+         return hasWon;
       }
    }
 
@@ -201,10 +215,5 @@ public class Game implements GameInterface {
       currentPlayerIndex++;
       if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
       return true;
-   }
-
-
-   private boolean didPlayerWin() {
-      return !(players.get(currentPlayerIndex).getPurse() == NUMBER_OF_COINS_TO_WIN);
    }
 }
