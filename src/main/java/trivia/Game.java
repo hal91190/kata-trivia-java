@@ -191,7 +191,7 @@ public class Game implements GameInterface {
 
       } else {
 
-         System.out.println("Answer was corrent!!!!");
+         System.out.println("Answer was correct!!!!");
          currentPlayer.gainsCoin();
          System.out.println(currentPlayer.getName()
                            + " now has "
