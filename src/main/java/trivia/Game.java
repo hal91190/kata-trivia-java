@@ -102,7 +102,7 @@ public class Game implements GameInterface {
    List<String> sportsQuestions = new LinkedList<>();
    List<String> rockQuestions = new LinkedList<>();
 
-   int currentPlayerIndex = 0;
+   private Player currentPlayer;
    boolean isGettingOutOfPenaltyBox;
 
    private Board board = new Board();
@@ -119,6 +119,7 @@ public class Game implements GameInterface {
    public boolean add(String playerName) {
       var player = new Player(playerName);
       players.add(player);
+      currentPlayer = players.getFirst();
 
       System.out.println(player.getName() + " was added");
       System.out.println("They are player number " + players.size());
@@ -126,7 +127,6 @@ public class Game implements GameInterface {
    }
 
    public void roll(int roll) {
-      var currentPlayer = players.get(currentPlayerIndex);
       System.out.println(currentPlayer.getName() + " is the current player");
       System.out.println("They have rolled a " + roll);
 
@@ -150,7 +150,6 @@ public class Game implements GameInterface {
    }
 
    private void askQuestion() {
-      var currentPlayer = players.get(currentPlayerIndex);
       var category = board.getCategory(currentPlayer.getPosition());
       switch (category) {
          case POP -> System.out.println(popQuestions.removeFirst());
@@ -161,7 +160,6 @@ public class Game implements GameInterface {
    }
 
    public boolean handleCorrectAnswer() {
-      var currentPlayer = players.get(currentPlayerIndex);
       boolean hasWon = true;
       if (currentPlayer.isFree() || isGettingOutOfPenaltyBox) {
          System.out.println("Answer was correct!!!!");
@@ -173,19 +171,22 @@ public class Game implements GameInterface {
 
          hasWon = currentPlayer.hasWon();
       }
-      currentPlayerIndex++;
-      if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
+      nextPlayer();
       return hasWon;
    }
 
    public boolean wrongAnswer() {
-      var currentPlayer = players.get(currentPlayerIndex);
       System.out.println("Question was incorrectly answered");
       System.out.println(currentPlayer.getName() + " was sent to the penalty box");
       currentPlayer.sendToPenaltyBox();
 
-      currentPlayerIndex++;
-      if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
+      nextPlayer();
       return true;
+   }
+
+   private void nextPlayer() {
+      int currentPlayerIndex = players.indexOf(currentPlayer);
+      currentPlayer = currentPlayerIndex < players.size() - 1 ?
+         players.get(currentPlayerIndex + 1) : players.get(0);
    }
 }
